@@ -2,66 +2,42 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from tkinter.font import BOLD
 import util.generic as utl
-from forms.form_master import MasterPanel
+from forms.master.form_master import MasterPanel
+from forms.login.form_login_designer import FormLoginDesigner
+from persistence.repository.auth_user_repository import AuthUserRepository
+from persistence.model import Auth_User
+import util.encoding_decoding as end_dec
 
-class App:
+class FormLogin(FormLoginDesigner):
+
+    def __init__(self):
+        self.auth_repository = AuthUserRepository()
+        super().__init__()
 
     def verificar(self):
-        usu = self.usuario.get()
-        password = self.password.get()
-        if(usu == "root" and password == "123"):
+        user_db: Auth_User = self.auth_repository.getUserByUserName(self.usuario.get())
+        if(self.isUser(user_db)):
+            self.isPassword(self.password.get(), user_db)
+        
+
+    def isUser(self, user: Auth_User):
+        status: bool = True
+        if(user == None):
+            status = False
+            messagebox.showerror(
+                message="el usuario no existe por favor registrese", title="Mensaje")
+        return status
+
+    def isPassword(self, password: str, user: Auth_User):
+        b_password = end_dec.decrypt(user.password)
+        if(password == b_password):
             self.ventana.destroy()
             MasterPanel()
         else:
-            messagebox.showerror(message="La contraseña no escorrecta", title="Mensaje")
+            messagebox.showerror(
+                message="La contraseña no es correcta", title="Mensaje")
+
+    
         
 
-    def __init__(self):
-        self.ventana = tk.Tk()
-        self.ventana.title('Inicio de sesión')
-        self.ventana.geometry('800x500')
-        self.ventana.config(bg='#fcfcfc')
-        self.ventana.resizable(width=0, height=0)
-        utl.centrar_ventana(self.ventana,800,500)
-        
-
-        logo = utl.leer_imagen("./imagenes/logo.png", (200,200))
-
-        #frame_logo
-        frame_logo = tk.Frame(self.ventana, bd=0, width=300, relief=tk.SOLID, padx=10, pady=10, bg='#009900')
-        frame_logo.pack(side="left",expand=tk.NO,fill=tk.BOTH)
-        label = tk.Label( frame_logo, image=logo,bg="#009900")
-        label.place(x=0,y=0,relwidth=1,relheight=1)
-
-        #frame_form
-        frame_form = tk.Frame(self.ventana, bd=0, relief=tk.SOLID, bg='#fcfcfc')
-        frame_form.pack(side="left",expand=tk.YES,fill=tk.BOTH)
-        #end frame_form
-
-        #frame_form_top
-        frame_form_top = tk.Frame(frame_form,height=50, bd=0, relief=tk.SOLID,bg='black')
-        frame_form_top.pack(side="top",fill=tk.X)
-        title = tk.Label(frame_form_top, text="Inicio de sesión",font=('Arial',30),fg="#666a88",bg="#fcfcfc",pady=50)
-        title.pack(expand=tk.YES,fill=tk.BOTH)
-        #end frame_form_top
-
-        #frame_form_fill
-        frame_form_fill = tk.Frame(frame_form, height=50, bd=0, relief=tk.SOLID,bg='#fcfcfc')
-        frame_form_fill.pack(side='bottom',expand=tk.YES,fill=tk.BOTH)
-
-        etiqueta_usuario = tk.Label(frame_form_fill, text="Usuario", font=('Arial',14), fg="#666a88", bg="#fcfcfc", anchor="w")
-        etiqueta_usuario.pack(fill=tk.X, padx=20, pady=5)
-        self.usuario = ttk.Entry(frame_form_fill, font=('Arial',14))
-        self.usuario.pack(fill=tk.X, padx=20,pady=10)
-
-        etiqueta_password = tk.Label(frame_form_fill, text="Contraseña", font=('Arial',14), fg="#666a88", bg="#fcfcfc", anchor="w")
-        etiqueta_password.pack(fill=tk.X, padx=20, pady=5)
-        self.password = ttk.Entry(frame_form_fill, font=('Arial',14))
-        self.password.pack(fill=tk.X, padx=20,pady=10)
-        self.password.config(show="*")
-
-        inicio = tk.Button(frame_form_fill,text="Iniciar Sesión", font=('Time', 15, BOLD),bg='#009900',bd=0,fg='#fff', command=self.verificar)
-        inicio.pack(fill=tk.X, padx=20,pady=20)
-        inicio.bind("<Return>", (lambda event: self.verificar()))
-
-        self.ventana.mainloop()
+       
