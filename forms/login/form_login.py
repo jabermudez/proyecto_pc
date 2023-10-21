@@ -1,12 +1,9 @@
-import tkinter as tk
-from tkinter import ttk, messagebox
-from tkinter.font import BOLD
-import util.generic as utl
+from tkinter import messagebox
 from forms.master.form_master import MasterPanel
-from forms.login.form_login_designer import FormLoginDesigner
 from persistence.repository.auth_user_repository import AuthUserRepository
-from persistence.model import Auth_User
 import util.encoding_decoding as end_dec
+from persistence.model import Auth_User
+from forms.login.form_login_designer import FormLoginDesigner
 from forms.registration.form import FormRegister
 
 
@@ -30,7 +27,7 @@ class FormLogin(FormLoginDesigner):
         if(user == None):
             status = False
             messagebox.showerror(
-                message="el usuario no existe por favor registrese", title="Mensaje")
+                message="el usuario no existe por favor registrese", title="Mensaje", parent=self.ventana)
         return status
 
     def isPassword(self, password: str, user: Auth_User):

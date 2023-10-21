@@ -15,7 +15,8 @@ class FormRegister(FormRegisterDesigner):
         if(self.isConfirmationPassword()):
             user = Auth_User()
             user.username = self.usuario.get()
-            user_db: Auth_User = self.auth_repository.getUserByUserName(self.usuario.get())
+            user_db: Auth_User = self.auth_repository.getUserByUserName(
+                self.usuario.get())
             
             if not (self.isUserRegister(user_db)):
                 user.password = end_dec.encrypted(self.password.get())
