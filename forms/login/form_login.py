@@ -12,7 +12,7 @@ class FormLogin(FormLoginDesigner):
     def __init__(self):
         self.auth_repository = AuthUserRepository()
         super().__init__()
-
+        
     def verificar(self):
         user_db: Auth_User = self.auth_repository.getUserByUserName(self.usuario.get())
         if(self.isUser(user_db)):
